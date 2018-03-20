@@ -1,6 +1,7 @@
 package ch.mibex.bitbucket.sonar.review
 
 import java.net.URLEncoder
+import java.util.Base64
 
 import ch.mibex.bitbucket.sonar.{SonarBBPlugin, SonarBBPluginConfig}
 import ch.mibex.bitbucket.sonar.client._
@@ -38,6 +39,12 @@ class SonarReviewPostJob(
   private def getSonarBaseUrl(settings: Settings) =
     Option(settings.getString(CoreProperties.SERVER_BASE_URL)).getOrElse(settings.getString("sonar.host.url"))
 
+  private def getSonarAuthHeaders(settings: Settings): Map[String, String] = {
+    val token = settings.getString(SonarBBPlugin.SonarQubeAuthToken)
+    if (token.isEmpty) Map("Authentication" -> Base64.getEncoder.encodeToString(s":${settings.getString(SonarBBPlugin.SonarQubeAuthToken)}".getBytes("utf-8")))
+    else Map()
+  }
+
   private def handlePullRequest(context: PostJobContext, pullRequest: PullRequest) {
     setBuildStatus(InProgressBuildStatus, context, pullRequest)
     val ourComments = bitbucketClient.findOwnPullRequestComments(pullRequest)
@@ -51,7 +58,7 @@ class SonarReviewPostJob(
 
   private def setBuildStatus(buildStatus: BuildStatus, context: PostJobContext, pullRequest: PullRequest) {
     if (pluginConfig.buildStatusEnabled()) {
-      bitbucketClient.updateBuildStatus(pullRequest, buildStatus, getProjectUrl(context, pullRequest))
+      bitbucketClient.updateBuildStatus(pullRequest, buildStatus, getProjectUrl(context, pullRequest), getSonarAuthHeaders(context.settings()))
     }
   }
 

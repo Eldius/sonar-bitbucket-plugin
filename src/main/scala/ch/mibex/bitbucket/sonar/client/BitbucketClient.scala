@@ -208,7 +208,7 @@ class BitbucketClient(config: SonarBBPluginConfig) {
     response.getStatus == 200
   }
 
-  def updateBuildStatus(pullRequest: PullRequest, buildStatus: BuildStatus, sonarServerUrl: String): Unit = {
+  def updateBuildStatus(pullRequest: PullRequest, buildStatus: BuildStatus, sonarServerUrl: String, headers: Map[String, String]): Unit = {
     try {
       // This uses the source url from the bitbucket response.
       // Typically pullrequests' source is not the same repo as where the PR was created.
@@ -216,6 +216,9 @@ class BitbucketClient(config: SonarBBPluginConfig) {
       val v2SourceApi = client.resource(
         s"${pullRequest.srcCommitHref.getOrElse(v2Api.path(s"/commit/${pullRequest.srcCommitHash.getOrElse("")}"))}"
       )
+
+      headers.foreach(e => v2SourceApi.header(e._1, e._2))
+
       v2SourceApi
         .path(s"/statuses/build")
         .`type`(MediaType.APPLICATION_JSON)

@@ -97,6 +97,7 @@ See this table about the possible configuration options:
 | sonar.bitbucket.approvalFeatureEnabled       | If enabled, the plug-in will approve the pull request if there are no issues with severity >= sonar.bitbucket.maxSeverityApprovalLevel, otherwise it will unapprove the pull request.                                          | true                                           | false                  |
 | sonar.bitbucket.buildStatusEnabled           | If enabled, the plug-in will update the build status of the pull request depending on the Sonar analysis result. The analysis and also the build is failed if there are any critical or blocker issues.                        | true                                           | false                  |
 | sonar.bitbucket.maxSeverityApprovalLevel     | If any issues of this level or higher are found, it will unapprove the pull request.                                                                                                                                           | CRITICAL                                       | MAJOR                  |
+| sonar.bitbucket.authToken                    | If defined, this plugin will be used as authentication token for SonarQube.                                                                                                                                                    |                                                | MY_SONAR_AUTH_TOKEN    |
 
 
 For authentication, you have to decide between if you want to create pull requests under your own user by using OAuth 
